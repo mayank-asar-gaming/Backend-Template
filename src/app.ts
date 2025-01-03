@@ -7,45 +7,39 @@ import { connectDB } from "./database/index";
 import configureExpress from "./express-config";
 
 const StartServer = async (): Promise<void> => {
-  // Check if uploads folder exists
-  const dir = "./uploads";
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
-  }
+    // Check if uploads folder exists
+    const dir = "./uploads";
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+    }
 
-  const app: Express = express();
+    const app: Express = express();
 
-  // Connect to DB
-  await connectDB();
+    // Connect to DB
+    await connectDB();
 
-  app.get("/", (req: Request, res: Response) => {    
-    res.status(200).send({ message: `Server Responsing........` });
-  });
+    app.get("/", (req: Request, res: Response) => {
+        res.status(200).send({ message: `Server Responsing........` });
+    });
 
-  // Rate limit
-  const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,  // 1000 request in 15 mins
-    max: 1000,
-    message: "Too many requests from this IP, please try again later.",
-  });
+    // Rate limit
+    const limiter = rateLimit({
+        windowMs: 15 * 60 * 1000, // 1000 request in 15 mins
+        max: 1000,
+        message: "Too many requests from this IP, please try again later.",
+    });
 
-  app.use(limiter);
+    app.use(limiter);
 
-  // Use Helmet first for security headers
-  app.use(helmet());
+    // Use Helmet first for security headers
+    app.use(helmet());
 
-  // Configure express
-  await configureExpress(app);
+    // Configure express
+    await configureExpress(app);
 
-  const server = app.listen(PORT, () => {
-    console.log(`Listening on port http://localhost:${PORT}/`);
-  });
-
-  // Handle errors
-  server.on("error", (err) => {
-    console.error("Server error:", err);
-    process.exit(1);
-  });
+    app.listen(PORT, () => {
+        console.log(`⚡️[Server]: YourSay Exchange matching engine running at http://localhost:${PORT}`);
+    });
 };
 
 StartServer();
